@@ -3,29 +3,49 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using Microsoft.IdentityModel.Tokens;
-using SampleServer;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 WebApplication app = builder.Build();
 
-app.MapPost("/token", (ConnectedApp connectedApp) =>
+app.MapGet("/token", (HttpContext httpContext) =>
 {
-    ArgumentException.ThrowIfNullOrEmpty(connectedApp.ClientId, nameof(connectedApp.ClientId));
-    ArgumentException.ThrowIfNullOrEmpty(connectedApp.SecretId, nameof(connectedApp.SecretId));
-    ArgumentException.ThrowIfNullOrEmpty(connectedApp.SecretValue, nameof(connectedApp.SecretValue));
-    ArgumentException.ThrowIfNullOrEmpty(connectedApp.UserName, nameof(connectedApp.UserName));
+    #region Variables
 
-    string kid = connectedApp.SecretId;
-    string iss = connectedApp.ClientId;
-    string sub = connectedApp.UserName;
+    // Replace the example values below (remove the brackets).
+    // Store secrets securely based on your team's best practices.
+    // See: https://help.tableau.com/current/online/en-us/connected_apps_direct.htm
+
+    string secretId = "[Connected App Secret ID]";
+    string secretValue = "[Connected App Secret Value]";
+    string clientId = "[Connected App Client ID]";
+    string username = "[Tableau Username]";
+    double tokenExpiryInMinutes = 1; // Max of 10 minutes.
+
+    Dictionary<string, string> userAttributes = new()
+    {
+        // User attributes are optional.
+        // Add entries to this dictionary if desired.
+        //{ "[User Attribute Name]", "[User Attribute Value]" }
+    };
+
+    // Remove 'embed_authoring' scope if Authoring is not needed.
+    string[] scopes = new[] { "tableau:views:embed", "tableau:views:embed_authoring" };
+
+    #endregion
+
+    #region JWT generation
+
+    string kid = secretId;
+    string iss = clientId;
+    string sub = username;
     string aud = "tableau";
-    DateTime exp = DateTime.UtcNow.AddMinutes(1);
+    DateTime exp = DateTime.UtcNow.AddMinutes(tokenExpiryInMinutes);
     string jti = Guid.NewGuid().ToString();
-    string scp = JsonSerializer.Serialize(new[] { "tableau:views:embed", "tableau:views:embed_authoring" });
+    string scp = JsonSerializer.Serialize(scopes);
 
     Dictionary<string, object> headerClaims = new() { { "iss", iss } };
 
-    byte[] key = Encoding.ASCII.GetBytes(connectedApp.SecretValue);
+    byte[] key = Encoding.ASCII.GetBytes(secretValue);
 
     // Provides 'kid' and 'alg' header claims.
     SigningCredentials signingCredentials = new(
@@ -40,7 +60,7 @@ app.MapPost("/token", (ConnectedApp connectedApp) =>
             new Claim("scp", scp, JsonClaimValueTypes.JsonArray),
         });
 
-    claims.AddRange(connectedApp.UserAttributes.Select(att => new Claim(att.Key, att.Value)));
+    claims.AddRange(userAttributes.Select(att => new Claim(att.Key, att.Value)));
 
     ClaimsIdentity subject = new(claims);
 
@@ -58,6 +78,8 @@ app.MapPost("/token", (ConnectedApp connectedApp) =>
     string jwt = tokenHandler.WriteToken(token);
 
     return new { jwt };
+
+    #endregion
 });
 
 app.Run();
