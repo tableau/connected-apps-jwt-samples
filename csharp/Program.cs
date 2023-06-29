@@ -1,85 +1,77 @@
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using Microsoft.IdentityModel.Tokens;
 
-WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-WebApplication app = builder.Build();
+#region Variables
 
-app.MapGet("/token", (HttpContext httpContext) =>
+// Replace the example values below (remove the brackets).
+// Store secrets securely based on your team's best practices.
+// See: https://help.tableau.com/current/online/en-us/connected_apps_direct.htm
+
+string secretId = "[Tableau Connected App Secret ID]";
+string secretValue = "[Tableau Connected App Secret Value]";
+string clientId = "[Tableau Connected App Client ID]";
+string username = "[Tableau Username]";
+double tokenExpiryInMinutes = 1; // Max of 10 minutes.
+
+Dictionary<string, string> userAttributes = new()
 {
-    #region Variables
+    // User attributes are optional.
+    // Add entries to this dictionary if desired.
+    //{ "[User Attribute Name]", "[User Attribute Value]" }
+};
 
-    // Replace the example values below (remove the brackets).
-    // Store secrets securely based on your team's best practices.
-    // See: https://help.tableau.com/current/online/en-us/connected_apps_direct.htm
+// Remove 'embed_authoring' scope if Authoring is not needed.
+string[] scopes = new[] { "tableau:views:embed", "tableau:views:embed_authoring" };
 
-    string secretId = "[Connected App Secret ID]";
-    string secretValue = "[Connected App Secret Value]";
-    string clientId = "[Connected App Client ID]";
-    string username = "[Tableau Username]";
-    double tokenExpiryInMinutes = 1; // Max of 10 minutes.
+#endregion
 
-    Dictionary<string, string> userAttributes = new()
+#region JWT generation
+
+string kid = secretId;
+string iss = clientId;
+string sub = username;
+string aud = "tableau";
+DateTime exp = DateTime.UtcNow.AddMinutes(tokenExpiryInMinutes);
+string jti = Guid.NewGuid().ToString();
+string scp = JsonSerializer.Serialize(scopes);
+
+Dictionary<string, object> headerClaims = new() { { "iss", iss } };
+
+byte[] key = Encoding.ASCII.GetBytes(secretValue);
+
+// Provides 'kid' and 'alg' header claims.
+SigningCredentials signingCredentials = new(
+    new SymmetricSecurityKey(key) { KeyId = kid },
+    SecurityAlgorithms.HmacSha256Signature);
+
+List<Claim> claims = new(
+    new[]
     {
-        // User attributes are optional.
-        // Add entries to this dictionary if desired.
-        //{ "[User Attribute Name]", "[User Attribute Value]" }
-    };
+        new Claim("sub", sub),
+        new Claim("jti", jti),
+        new Claim("scp", scp, JsonClaimValueTypes.JsonArray),
+    });
 
-    // Remove 'embed_authoring' scope if Authoring is not needed.
-    string[] scopes = new[] { "tableau:views:embed", "tableau:views:embed_authoring" };
+claims.AddRange(userAttributes.Select(att => new Claim(att.Key, att.Value)));
 
-    #endregion
+ClaimsIdentity subject = new(claims);
 
-    #region JWT generation
+SecurityTokenDescriptor tokenDescriptor = new()
+{
+    Audience = aud,
+    Subject = subject,
+    AdditionalInnerHeaderClaims = headerClaims,
+    SigningCredentials = signingCredentials,
+    Expires = exp
+};
 
-    string kid = secretId;
-    string iss = clientId;
-    string sub = username;
-    string aud = "tableau";
-    DateTime exp = DateTime.UtcNow.AddMinutes(tokenExpiryInMinutes);
-    string jti = Guid.NewGuid().ToString();
-    string scp = JsonSerializer.Serialize(scopes);
+JwtSecurityTokenHandler tokenHandler = new();
+SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
+string jwt = tokenHandler.WriteToken(token);
 
-    Dictionary<string, object> headerClaims = new() { { "iss", iss } };
+Console.WriteLine(jwt);
 
-    byte[] key = Encoding.ASCII.GetBytes(secretValue);
-
-    // Provides 'kid' and 'alg' header claims.
-    SigningCredentials signingCredentials = new(
-        new SymmetricSecurityKey(key) { KeyId = kid },
-        SecurityAlgorithms.HmacSha256Signature);
-
-    List<Claim> claims = new(
-        new[]
-        {
-            new Claim("sub", sub),
-            new Claim("jti", jti),
-            new Claim("scp", scp, JsonClaimValueTypes.JsonArray),
-        });
-
-    claims.AddRange(userAttributes.Select(att => new Claim(att.Key, att.Value)));
-
-    ClaimsIdentity subject = new(claims);
-
-    SecurityTokenDescriptor tokenDescriptor = new()
-    {
-        Audience = aud,
-        Subject = subject,
-        AdditionalInnerHeaderClaims = headerClaims,
-        SigningCredentials = signingCredentials,
-        Expires = exp
-    };
-
-    JwtSecurityTokenHandler tokenHandler = new();
-    SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
-    string jwt = tokenHandler.WriteToken(token);
-
-    return new { jwt };
-
-    #endregion
-});
-
-app.Run();
+#endregion
