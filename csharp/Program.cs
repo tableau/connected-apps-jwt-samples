@@ -10,9 +10,9 @@ using Microsoft.IdentityModel.Tokens;
 // Store secrets securely based on your team's best practices.
 // See: https://help.tableau.com/current/online/en-us/connected_apps_direct.htm
 
-string secretId = "[Tableau Connected App Secret ID]";
-string secretValue = "[Tableau Connected App Secret Value]";
-string clientId = "[Tableau Connected App Client ID]";
+string secretId = "[Tableau Connected App Direct Trust Secret ID]";
+string secretValue = "[Tableau Connected App Direct Trust Secret Value]";
+string clientId = "[Tableau Connected App Direct Trust Client ID]";
 string username = "[Tableau Username]";
 double tokenExpiryInMinutes = 1; // Max of 10 minutes.
 
