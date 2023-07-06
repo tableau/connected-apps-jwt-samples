@@ -1,18 +1,14 @@
-from flask import Flask, json
-
 import datetime
 import uuid
 import jwt
-
-app = Flask(__name__)
 
 # Replace the example values below (remove the brackets).
 # Store secrets securely based on your team's best practices.
 # See: https://help.tableau.com/current/online/en-us/connected_apps_direct.htm
 
-secretId = "[Connected App Secret ID]"
-secretValue = "[Connected App Secret Value]"
-clientId = "[Connected App Client ID]"
+secretId = "[Tableau Connected App Direct Trust Secret ID]"
+secretValue = "[Tableau Connected App Direct Trust Secret Value]"
+clientId = "[Tableau Connected App Direct Trust Client ID]"
 username = "[Tableau Username]"
 tokenExpiryInMinutes = 1  # Max of 10 minutes.
 
@@ -42,19 +38,6 @@ payload = {
     "scp": scp,
 } | userAttributes
 
-
-@app.after_request
-def after_request(response):
-    response.headers[
-        "Cache-Control"
-    ] = "no-cache, no-store, must-revalidate, public, max-age=0"
-    response.headers["Expires"] = 0
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Content-Type"] = "application/json"
-    return response
-
-
-@app.route("/token", methods=["GET"])
 def getJwt():
     token = jwt.encode(
         payload,
@@ -66,10 +49,10 @@ def getJwt():
         },
     )
 
-    headers = {"Content-Type": "application/json"}
 
-    return json.dumps({"jwt": token})
+    return token
 
 
 if __name__ == "__main__":
-    app.run()
+    token = getJwt()
+    print(token)
