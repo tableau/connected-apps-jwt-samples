@@ -1,4 +1,4 @@
-# Tableau Connected Apps Direct Trust JWT Generation (JS)
+# Tableau Connected Apps Direct Trust JWT Generation (JavaScript + Node.js)
 
 ## Prerequisites
 
@@ -8,6 +8,6 @@
 ## Getting Started
 
 1. Update the config variables in `index.js` with your Tableau Connected App information.
-1. Execute `npm install` from the terminal to install all dependencies.
+1. Execute `npm ci` from the terminal to install all dependencies.
 1. Execute `node index.js` from the terminal.
 1. The JWT will be printed to the console.
