@@ -38,6 +38,7 @@ payload = {
     "scp": scp,
 } | userAttributes
 
+
 def getJwt():
     token = jwt.encode(
         payload,
@@ -48,7 +49,6 @@ def getJwt():
             "iss": iss,
         },
     )
-
 
     return token
 
