@@ -47,8 +47,10 @@ public class JWT {
         .issueTime(new Date())
         .jwtID(myGeneratedId.toString())
         .claim("scp", scopes)
-        // example user-defined claim
-        .claim("Region", "East")
+        //  User attributes are optional.
+        //  Add additional claims if desired.
+        //  Example:
+        //  .claim("Region", "East")
         .build();
 
         String JWTValue;
