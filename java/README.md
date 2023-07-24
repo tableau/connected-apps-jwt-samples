@@ -7,5 +7,7 @@
 
 ## Getting Started
 
+```
 > mvn package
 > java -jar target\jwt-sample-1.0-SNAPSHOT.jar
+```
