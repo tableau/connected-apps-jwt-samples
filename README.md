@@ -7,7 +7,7 @@ This repository contains C#, Java, JavaScript, and Python samples for generating
 ## Getting Started
 
 - Clone this repository.
-- Follow the instructions in the README.md file for in the directory for the language you want to use.
+- Follow the instructions in the README.md file in the directory for the language you want to use.
 - If you'd like to see a sample in other languages, please let us know by creating or thumbs-upping (👍) an issue.
 
 ## References
