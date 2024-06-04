@@ -23,7 +23,7 @@ function tableau_jwt_shortcode($atts)
     $api_url = 'https://' . $domain . $api_path;
 
     // Define static values from Tableau Connected App
-    $username = 'john.keegan86@gmail.com';
+    $username = 'userName';
     // Connected App Client ID
     $iss = 'Connected App Client ID';
     // Connected App Secret ID;
