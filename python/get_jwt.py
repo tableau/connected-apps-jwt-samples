@@ -12,8 +12,13 @@ clientId = "[Tableau Connected App Direct Trust Client ID]"
 username = "[Tableau Username]"
 tokenExpiryInMinutes = 1  # Max of 10 minutes.
 
-# Remove 'embed_authoring' scope if Authoring is not needed.
-scopes = ["tableau:views:embed", "tableau:views:embed_authoring"]
+# Remove 'tableau:views:embed_authoring' scope if Authoring is not needed.
+# Remove 'tableau:insights:embed' scope if Pulse is not needed.
+scopes = [
+    "tableau:views:embed",
+    "tableau:views:embed_authoring",
+    "tableau:insights:embed",
+]
 
 kid = secretId
 iss = clientId

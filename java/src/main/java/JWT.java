@@ -32,8 +32,9 @@ public class JWT {
         Calendar expiry = Calendar.getInstance();
         expiry.add(Calendar.MINUTE, (int)tokenExpiryInMinutes);
 
-        // Remove 'embed_authoring' scope if Authoring is not needed.
-        String[] scopes = {"tableau:views:embed", "tableau:views:embed_authoring" };
+        // Remove 'tableau:views:embed_authoring' scope if Authoring is not needed.
+        // Remove 'tableau:insights:embed' scope if Pulse is not needed.
+        String[] scopes = {"tableau:views:embed", "tableau:views:embed_authoring", "tableau:insights:embed" };
 
         UUID myGeneratedId = UUID.randomUUID();
 

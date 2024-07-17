@@ -23,8 +23,9 @@ Dictionary<string, string> userAttributes = new()
     //{ "[User Attribute Name]", "[User Attribute Value]" }
 };
 
-// Remove 'embed_authoring' scope if Authoring is not needed.
-string[] scopes = new[] { "tableau:views:embed", "tableau:views:embed_authoring" };
+// Remove 'tableau:views:embed_authoring' scope if Authoring is not needed.
+// Remove 'tableau:insights:embed' scope if Pulse is not needed.
+string[] scopes = new[] { "tableau:views:embed", "tableau:views:embed_authoring", "tableau:insights:embed" };
 
 #endregion
 
