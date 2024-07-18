@@ -9,9 +9,12 @@ function generateJwt() {
   const secret = "[secretvalue]";
   const secretId = "[connectedAppSecretId]";
   const clientId = "[connectedAppClientId]";
-  const scopes = ["tableau:views:embed", "tableau:views:embed_authoring"];
   const userId = "[tableau username]";
   const tokenExpiryInMinutes = 1; // Max of 10 minutes.
+
+  // Remove 'tableau:views:embed_authoring' scope if Authoring is not needed.
+  // Remove 'tableau:insights:embed' scope if Pulse is not needed.
+  const scopes = ["tableau:views:embed", "tableau:views:embed_authoring", "tableau:insights:embed"];
 
   const userAttributes = {
     //  User attributes are optional.
